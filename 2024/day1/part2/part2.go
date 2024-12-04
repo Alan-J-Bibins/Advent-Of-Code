@@ -1,3 +1,4 @@
+// functions are all the same from part1 except for the addition of binarySearch and findFreq
 package main
 
 import (
@@ -8,6 +9,41 @@ import (
 	"strconv"
 	"strings"
 )
+
+func binarySearch(arr []int, target int) (bool, int) {
+	var low, high int = 0, len(arr) - 1
+
+	for low <= high {
+		mid := low + (high-low)/2
+		if arr[mid] == target {
+			return true, mid
+		} else if arr[mid] > target {
+			high = mid - 1
+		} else if arr[mid] < target {
+			low = mid + 1
+		}
+	}
+
+	return false, -1
+}
+
+func similarityScore(target int, arr []int) int {
+	foundElement, index := binarySearch(arr, target)
+	if foundElement {
+		var count int = 1
+        // Checking elements after index
+		for i := index; i < len(arr)-1 && arr[i+1] == target; i++ {
+			count++
+		}
+        // Checking elements before index
+		for i := index; i > 0 && arr[i-1] == target; i-- {
+			count++
+		}
+		return target * count
+	} else {
+		return 0
+	}
+}
 
 func partition(arr []int, low int, high int) int {
 	pivot := arr[high]
@@ -86,16 +122,10 @@ func main() {
 	quicksort(arr1, 0, len(arr1)-1)
 	quicksort(arr2, 0, len(arr2)-1)
 
-	var difference []int
-	// getting difference of sorted arrays index-wise
-	for i := range len(arr1) {
-		difference = append(difference, abs(arr2[i]-arr1[i]))
-	}
-
-	// getting the sum of the difference slice
+	// getting the sum of the similarity scores of elements
 	sum := 0
-	for i := range len(difference) {
-		sum += difference[i]
+	for i := range len(arr1) {
+		sum += similarityScore(arr1[i], arr2)
 	}
 
 	fmt.Println("Answer = ", sum)
